@@ -60,7 +60,6 @@ const slide = new Slide({
     interactive: true,
     mode: "local",
     // 以下为可选配置
-    controller: false,
     resize: false,
     enableGlobalClick: false,
     timestamp: Date.now,
@@ -72,7 +71,6 @@ const slide = new Slide({
 
 |  key   | type  | description |
 |  ----  | ----  | ---         |
-| controller | boolean | **默认值:** false <br/> 是否显示用于 debug 的控制栏, 可以查看 fps 调整 fps、分辨率等信息。 |
 | resize  | boolean | **默认值:** false <br/> 设置是否根据窗口大小自动调整分辨率。<br/> 默认情况下 ppt 的 css 尺寸会随着 anchor 元素的大小而变化, 但是 canvas 元素的渲染分辨率不会变化。将此值设置为 true, 会使 canvas 的分辨率也跟随缩放比例缩放，这样能获得更好的性能，但是当 anchor 的 css 尺寸太小的情况下，也会导致画面模糊。<br /> 除非遇到性能问题，一般不建议设置为 true 。|
 | enableGlobalClick  | boolean |**默认值:** false <br/> 用于控制是否可以通过点击 ppt 画面执行下一步功能。<br /> 建议移动端开启，移动端受限于屏幕尺寸，交互 UI 较小，如果开启此功能会比较方便执行下一步。|
 | timestamp  | () => number |**默认值:** Date.now <br/> 此函数用于获取当前时间, 在同步及互动场景下，ppt 内部需要知道当前时间，这个时间对于参与同步(互动)的多个客户端应该是一致的，这个时间越精确，画面同步也越精确。<br />建议通过后端服务，为多个客户端下发相同的时间。|
@@ -85,7 +83,6 @@ const slide = new Slide({
 | minFPS | number | **默认值:** 30 <br/> 设置最小 fps, 应用会尽量保证实际 fps 高于此值, 此值越小, cpu 开销越小。 |
 | maxFPS | number | **默认值:** 40 <br/> 设置最大 fps, 应用会保证实际 fps 低于此值, 此值越小, cpu 开销越小。 |
 | resolution | number | **默认值:** pc 浏览器为 window.devicePixelRatio; 移动端浏览器为 1 。<br/> 设置渲染分辨倍率, 原始 ppt 有自己的像素尺寸，当在 2k 或者 4k 屏幕下，如果按原始 ppt 分辨率显示，画面会比较模糊。可以调整此值，使画面更清晰，同时性能开销也变高。<br /> 建议保持默认值就行，或者固定为 1。 |
-| minResolution | number | **默认值:** 1, 在开启了动态分辨率的情况下，此值用于控制最小分辨倍率。<br /> 建议保持默认值。 |
 | autoResolution | boolean | **默认值:** false, 控制是否根据运行时实际 fps 自动缩放渲染分辨率, 使得运行时 fps 保持在 minFPS 和 masFPS 之间 |
 | autoFPS | boolean | **默认值:** false, 控制开启动态 fps, 开启后, 会根据 cpu 效率动态提升和降低 fps |
 | transactionBgColor | string &#124; number | **默认值:** 0x000000, 设置切页动画的背景色, 接受 css 颜色字符串或者 16进制颜色值("#ffffff",0xffffff) |
@@ -167,5 +164,29 @@ const snapshot = slideA.slideState;
 
 // 将 slideB 的状态同步到 slideA 当前状态
 slideB.setSlideState(snapshot);
+
 ```
+
+在同步模式下, 被同步的客户端 B 可以在断线重连后询问客户端 A 的当前状态, 客户端 A 收到询问后可以使用上述 API 获取状态快照.
+但是在互动模式下, 这种询问的机制就不适用了, 互动模式下所有客户端应该共享同一个状态, 要做到这种效果, 可以在某处(一般是 socket 房间信息上)记录这个状态快照, `@netless/slide` 会在状态变更后通知给你，此时可以将最新的状态记录下来.
+
+```javascript
+slideA.on(SLIDE_EVENTS.stateChange, snapshot => {
+    socket.room.slideState = snapshot;
+});
+
+// 客户端 B 重新连接后, 获取房间信息上的状态并设置
+socket.on("connect", () => {
+    slideB.setSlideState(socket.room.slideState);
+});
+```
+
+### 竞态处理
+
+在互动模式下, 由于每个客户端都可以独立的与 ppt 交互，因此存在竞态条件。例如, 客户端 A 执行翻到下一页(记为事件 A),与此同时客户端 B 执行切换到下一个动画(记为事件 B). 这两个事件执行的顺序会影响最终的状态(假设执行事件之前, 处于 ppt 第一页的第一个动画):
+
+**A-B:** 先翻页, 再播放下一个动画, 最终状态为第二页的第一个动画  
+**B-A:** 先播放下一个动画, 再执行下一页, 最终状态为第二页第 0 个动画
+
+这两个事件都会传递到 socket 服务器。socket 服务器是否是按事件产生的真实时间来下发这两个事件并不重要, 重要的是两个客户端接收事件的顺序必须一致(A-B或者B-A)，如此才能保证两个客户端最终状态一致。因此, 你需要保证参与互动的每个客户端收到的事件顺序是一致的。
 
