@@ -109,13 +109,11 @@ slideA.on(SLIDE_EVENTS.syncDispatch, (event) => {
 });
 
 // client B
+// 另一个客户端通过 socket 接收事件
 socket.on("slide-sync", msg => {
     const event = JSON.parse(msg);
-    // 另一个客户端通过 socket 接收事件
-    socket.on("slide-sync", () => {
-        // 将反序列化后的事件对象派发给 slide 对象, 即可完成同步
-        slideB.emit(SLIDE_EVENTS.syncReceive, event);
-    });
+    // 将反序列化后的事件对象派发给 slide 对象, 即可完成同步
+    slideB.emit(SLIDE_EVENTS.syncReceive, event);
 });
 ```
 
@@ -123,7 +121,7 @@ socket.on("slide-sync", msg => {
 
 互动模式下, 各个客户端都可以自由操作 ppt. 与同步模式一样, `@netless/slide` 库通过事件将各个客户端的操作通知给 `@netless/slide` 的调用方, 调用方负责将这些事件传递给所有客户端(包括自己). 与同步模式不同的是, 互动模式下, 发送事件的客户端也同时需要处理接收事件.
 
-要使用同步模式需要将上述的 `mode` 参数设置为 `"interactive"`.
+要使用互动模式需要将上述的 `mode` 参数设置为 `"interactive"`.
 
 ```javascript
 // client A
@@ -136,9 +134,7 @@ slideA.on(SLIDE_EVENTS.syncDispatch, (event) => {
 // 的事件, 并将事件派发给 slideA 对象.
 socket.on("slide-sync", msg => {
     const event = JSON.parse(msg);
-    socket.on("slide-sync", () => {
-        slideA.emit(SLIDE_EVENTS.syncReceive, event);
-    });
+    slideA.emit(SLIDE_EVENTS.syncReceive, event);
 });
 
 // client B 执行与 clientA 一样的逻辑, 监听 SLIDE_EVENTS.syncDispatch 事件并广播出去
@@ -148,9 +144,7 @@ slideB.on(SLIDE_EVENTS.syncDispatch, (event) => {
 });
 socket.on("slide-sync", msg => {
     const event = JSON.parse(msg);
-    socket.on("slide-sync", () => {
-        slideB.emit(SLIDE_EVENTS.syncReceive, event);
-    });
+    slideB.emit(SLIDE_EVENTS.syncReceive, event);
 });
 ```
 
