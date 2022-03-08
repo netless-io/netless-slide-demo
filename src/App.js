@@ -50,6 +50,9 @@ function App() {
                 mode: mode,
                 controller: true,
             });
+            slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {
+                console.log(s);
+            });
             if (mode === "sync") {
                 slideA.current.on(SLIDE_EVENTS.syncDispatch, (e) => {
                     if (slideB.current) {
@@ -107,7 +110,7 @@ function App() {
                 </div>
                 <select value={mode} onChange={updateMode}>
                     <option value={"local"}>本地模式</option>
-                    <option value={"sync"}>同步模式</option>
+                    {/*<option value={"sync"}>同步模式</option>*/}
                     <option value={"interactive"}>互动模式</option>
                 </select>
             </div>

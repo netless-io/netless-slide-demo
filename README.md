@@ -14,7 +14,7 @@
 |  ----  | ----  | ---         |
 | anchor | HTMLElement | 作为 `Slide` 渲染出的 `canvas` 元素的挂载点 |
 | interactive  | boolean |ppt 是否可交互, 不可交互的 ppt 无法响应用户的事件|
-| mode  | "local" &#124; "sync" &#124; "interactive" |local: 单机模式, Slide 对象不会触发任意同步事件。<br/>sync: 同步模式, 用于一个客户端可以交互, 其他客户端不可交互的场景。<br/>interactive: 互动模式, 所有客户端都可以交互|
+| mode  | "local" &#124; "interactive" |local: 单机模式, Slide 对象不会触发任意同步事件。<br/>interactive: 互动模式, 所有客户端都可以交互|
 
 ```javascript
 import { Slide } from "@netless/slide";
@@ -88,34 +88,6 @@ const slide = new Slide({
 | autoResolution | boolean | **默认值:** false, 控制是否根据运行时实际 fps 自动缩放渲染分辨率, 使得运行时 fps 保持在 minFPS 和 masFPS 之间 |
 | autoFPS | boolean | **默认值:** false, 控制开启动态 fps, 开启后, 会根据 cpu 效率动态提升和降低 fps |
 | transactionBgColor | string &#124; number | **默认值:** 0x000000, 设置切页动画的背景色, 接受 css 颜色字符串或者 16进制颜色值("#ffffff",0xffffff) |
-
-## 同步与互动模式
-
-
-
-### 同步模式
-
-同步模式旨在将一个客户端的交互操作同步到另一个(多个)客户端, `@netless/slide` 库仅在需要同步的时候, 派发同步事件, 并不负责改事件如何发送至被同步的客户端, 你需要自行处理事件的发送(一般是通过 websocket)。  
-
-要使用同步模式需要将上述的 `mode` 参数设置为 `"sync"`. 同时被同步的客户端需要将 `interactive` 参数设置为 `false`.
-
-```javascript
-// client A
-
-slideA.on(SLIDE_EVENTS.syncDispatch, (event) => {
-    // event 为可序列化的 js 对象, 你无需关心 event 具体信息
-    // 只需要将序列化后的 event 广播给需要被同步的客户端
-    socket.boardcast("slide-sync", JSON.stringify(event));
-});
-
-// client B
-// 另一个客户端通过 socket 接收事件
-socket.on("slide-sync", msg => {
-    const event = JSON.parse(msg);
-    // 将反序列化后的事件对象派发给 slide 对象, 即可完成同步
-    slideB.emit(SLIDE_EVENTS.syncReceive, event);
-});
-```
 
 ### 互动模式
 
