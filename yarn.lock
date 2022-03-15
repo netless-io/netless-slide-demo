@@ -1339,10 +1339,10 @@
   resolved "https://registry.yarnpkg.com/@juggle/resize-observer/-/resize-observer-3.3.1.tgz#b50a781709c81e10701004214340f25475a171a0"
   integrity sha512-zMM9Ds+SawiUkakS7y94Ymqx+S0ORzpG3frZirN3l+UlXUmSUR7hF4wxCVqW+ei94JzV5kt0uXBcoOEAuiydrw==
 
-"@netless/slide@0.2.7":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.2.7.tgz#b546704948fe2090d3d66276bd47a221a99b3900"
-  integrity sha512-3VvTmBHbY639HkDOjKNkgTjncU+2Y0lHddu0tRyWAlKU8hIs9C5/VhgVe0tJTyWbLazz2GzX3XrSkrjkLrGSvw==
+"@netless/slide@^0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.2.9.tgz#44a460850ab40892142bb93e8a1ecde5cb6ce88f"
+  integrity sha512-OBQqk+Hj23Kux9DkDZFYDk9gAz25O+NF0yA2YTJHCugh2hfijLoarkkQ9x/hkKCC0FnOUSCb9emfgrrnua3eNg==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
     "@types/dat.gui" "^0.7.7"

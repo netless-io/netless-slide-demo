@@ -158,3 +158,97 @@ socket.on("connect", () => {
 
 这两个事件都会传递到 socket 服务器。socket 服务器是否是按事件产生的真实时间来下发这两个事件并不重要, 重要的是两个客户端接收事件的顺序必须一致(A-B或者B-A)，如此才能保证两个客户端最终状态一致。因此, 你需要保证参与互动的每个客户端收到的事件顺序是一致的。
 
+## rtc 混音
+
+**注意: `@netless/slide@0.2.8` 版本才开始支持。**
+
+ppt 里设计的音频和视频, 默认是用浏览器的 api 来播放, 如果有 rtc 混音需要可以提供自定义的播放器类来替换掉内置播放器。自定义的播放器需要实现下面的 `RtcAudioClazz` 接口。
+```typescript
+export interface RtcAudio {
+    /**
+     * 开始播放音频.
+     */
+    play(): void;
+
+    /**
+     * 暂停音频播放, 且音频当前播放时间不变
+     */
+    pause(): void;
+
+    /**
+     * 当音频对象不再使用时候被调用
+     */
+    destroy(): void;
+
+    /**
+     * 获取音频当前播放时间, 单位为:秒
+     */
+    get currentTime(): number;
+    /**
+     * 设置音频当前播放时间, 单位为:秒。需注意, 无论音频是否正在播放, 都需要确保能设置成功。
+     * 如果音频暂停状态下, 设置此值, 那么需保证, 下次恢复播放是从此值位置开始播放。
+     */
+    set currentTime(time: number);
+
+    /**
+     * 返回音频是否暂停状态
+     */
+    get isPaused(): boolean;
+
+    /**
+     * 返回音频时长
+     */
+    get duration(): number;
+
+    /**
+     * 当音频加载完成时触发, 例如: 音频 meta 数据加载完成, 这时候知道了音频实际时长, 就需要触发此事件, 需要保证此事件触发时,
+     * 能通过 duration 属性获取到更新后的音频时长
+     * @param event
+     * @param listener
+     */
+    on(event: "load", listener: () => void): this;
+
+    /**
+     * 当音频暂停时候触发
+     * @param event
+     * @param listener
+     */
+    on(event: "pause", listener: () => void): this;
+
+    /**
+     * 当音频开始播放时候触发
+     * @param event
+     * @param listener
+     */
+    on(event: "play", listener: () => void): this;
+
+    /**
+     * 移除参数指定事件的所有监听器
+     */
+    removeAllListeners(event: string): void;
+}
+
+export interface RtcAudioClazz {
+    /**
+     * 创建 rtc 播放器, url 为音频地址
+     * @param url
+     */
+    new(url: string): RtcAudio;
+}
+```
+
+js 实现的自定义播放器示例代码可以[参考](./src/RtcAudioPlayer.js)。将自定义的播放器类传递给 `Slide` 的构造函数, 即可替换默认的音频播放器。
+```typescript
+import { Slide } from "@netless/slide";
+
+const slide = new Slide({
+    anchor: someDivElement,
+    interactive: true,
+    mode: "local",
+    rtcAudio: RtcAudioPlayer,
+});
+```
+
+对于 mp3 文件, `@netless/slide` 直接调用自定义的播放器播放音频。
+
+对于 mp4 文件, 转码服务已经将 mp4 的音频单独提取出一个 mp3 文件, `@netless/slide` 将 mp4 静音, 同时用提供的自定义播放器播放对应的 mp3。

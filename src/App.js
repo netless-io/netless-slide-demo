@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Slide, SLIDE_EVENTS } from "@netless/slide";
 import './App.css';
+import {RtcAudioPlayer} from "./RtcAudioPlayer";
 
 function App() {
+    const [useRtc, setUseRtc] = useState(false);
     const [mode, setMode] = useState("local");
     const [taskId, setTaskId] = useState("06415a307f2011ec8bdc15d18ec9acc7");
     const [prefixUrl, setPrefixUrl] = useState("https://convertcdn.netless.group/dynamicConvert");
@@ -49,6 +51,7 @@ function App() {
                 interactive: true,
                 mode: mode,
                 controller: true,
+                rtcAudio: useRtc ? RtcAudioPlayer : undefined,
             });
             slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {
                 console.log(s);
@@ -71,9 +74,10 @@ function App() {
             slideA.current.renderSlide(1);
         }
         return () => {
+            console.log("slide A destroy");
             slideA.current?.destroy();
         };
-    }, [taskId, prefixUrl, mode]);
+    }, [taskId, prefixUrl, mode, useRtc]);
 
     useEffect(() => {
         if (mode === "sync" || mode === "interactive") {
@@ -82,6 +86,7 @@ function App() {
                 interactive: mode !== "sync",
                 mode: mode,
                 controller: true,
+                rtcAudio: useRtc ? RtcAudioPlayer : undefined,
             });
             if (mode === "interactive") {
                 slideB.current.on(SLIDE_EVENTS.syncDispatch, (e) => {
@@ -95,9 +100,10 @@ function App() {
             slideB.current.renderSlide(1);
         }
         return () => {
+            console.log("slide B destroy");
             slideB.current?.destroy();
         };
-    }, [mode, taskId, prefixUrl]);
+    }, [mode, taskId, prefixUrl, useRtc]);
 
     return (
         <div className="App">
@@ -108,11 +114,16 @@ function App() {
                     <label>prefixUrl:</label>
                     <input value={prefixUrl} onChange={updatePrefix}/>
                 </div>
-                <select value={mode} onChange={updateMode}>
-                    <option value={"local"}>本地模式</option>
-                    {/*<option value={"sync"}>同步模式</option>*/}
-                    <option value={"interactive"}>互动模式</option>
-                </select>
+                <div>
+                    <span>启用 rtc 混音</span>
+                    <input type="checkbox" id="bike" value={useRtc} onChange={() => setUseRtc(!useRtc)}/>
+                    <span>{" "}</span>
+                    <select value={mode} onChange={updateMode}>
+                        <option value={"local"}>本地模式</option>
+                        {/*<option value={"sync"}>同步模式</option>*/}
+                        <option value={"interactive"}>互动模式</option>
+                    </select>
+                </div>
             </div>
             <div className={"content"}>
                 <div className={"anchor"} ref={anchorA} style={{width: mode !== "local" ? "45%" : "90%"}}>
