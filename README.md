@@ -160,7 +160,7 @@ socket.on("connect", () => {
 
 ## rtc 混音
 
-**注意: `@netless/slide@0.2.8` 版本才开始支持。**
+**注意: `@netless/slide@0.2.9` 版本才开始支持。**
 
 ppt 里设计的音频和视频, 默认是用浏览器的 api 来播放, 如果有 rtc 混音需要可以提供自定义的播放器类来替换掉内置播放器。自定义的播放器需要实现下面的 `RtcAudioClazz` 接口。
 ```typescript
