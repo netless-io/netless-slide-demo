@@ -252,3 +252,74 @@ const slide = new Slide({
 对于 mp3 文件, `@netless/slide` 直接调用自定义的播放器播放音频。
 
 对于 mp4 文件, 转码服务已经将 mp4 的音频单独提取出一个 mp3 文件, `@netless/slide` 将 mp4 静音, 同时用提供的自定义播放器播放对应的 mp3。
+
+## 错误处理与日志
+
+`@netless/slide@0.3.3` 版本开始, 会捕获当前页面的所有错误, 并通过 `SLIDE_EVENTS.renderError` 事件通知出来,
+你可以在此事件的回调函数里跳转到下一页.
+
+### 错误类型说明
+
+`@netless/slide` 导出有 `ErrorType` 枚举类型, 指示了 `SLIDE_EVENTS.renderError` 事件对应的错误类型，说明如下
+
+|  名称   | 触发时机  | 恢复手段 |
+|  ----  | ----  | ---         |
+| ResourceError | 在 ppt 依赖的远程资源(json,png)不可用时触发, 触发后当前页无法交互 | 重新渲染当前页或者跳转下一页  |
+| RuntimeError | 未知的异常， 触发后当前页无法交互 | 跳转下一页 |
+| RuntimeWarn | 未知的警告， 在动画过程中出现，触发后动画当前帧表现异常，不影响下一帧和页面交互 | 无需特殊处理 |
+|CanvasCrash| 由于内存不足，或者 canvas 被意外的移除(没有调用 slide.destroy() 的情况下移除 canvas 元素为意外移除), 触发后 canvas 元素白屏 | 刷新网页 |
+
+```typescript
+import { SLIDE_EVENTS, ErrorType } from "@netless/slide";
+
+// SlideError 继承自 Error, 除了 message, stack 等属性外
+// 还添加了 errorType 及 errorMsg 属性,
+interface SlideError extends Error {
+    errorType: ErrorType;
+    errorMsg: string;
+}
+
+slide.on(SLIDE_EVENTS.renderError, (err: SlideError, index: number) => {
+    console.log(`第 ${index} 页出错`);
+    if (err.errorType === ErrorType.ResourceError) {
+        // 跳转到下一页, 可以根据具体需求选择如何恢复, 例如弹窗确认后再做跳转动作
+        slide.renderSlide(index + 1);
+    } else if (err.errorType === ErrorType.CanvasCrash) {
+        // 需要刷新页面
+    } else if (err.errorType === ErrorType.RuntimeError) {
+        // 跳转到下一页
+        slide.renderSlide(index + 1);
+    } else if (err.errorType === ErrorType.RuntimeWarn) {
+        // 无需特殊处理, 可以记录日志
+    }
+});
+```
+
+### 日志
+
+`@netless/slide@0.3.3` 版本开始, `ISlideConfig` 中添加了可选的 logger 属性, 需要传入一个符合如下接口的对象
+
+```typescript
+interface ILogger {
+    info?(msg: string): void;
+    error?(msg: string): void;
+    warn?(msg: string): void;
+}
+```
+
+如此便可以接收 ppt 运行日志.
+
+```typescript
+import { Slide } from "@netless/slide";
+
+const slide = new Slide({
+    anchor: someDivElement,
+    interactive: true,
+    mode: "local",
+    logger: {
+        info(msg: string) {
+            console.log(msg);
+        }
+    }
+});
+```

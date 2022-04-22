@@ -45,6 +45,7 @@ function App() {
     }, []);
 
     useEffect(() => {
+        console.log("[t]", taskId);
         if (anchorA.current) {
             slideA.current = new Slide({
                 anchor: anchorA.current,
@@ -52,9 +53,23 @@ function App() {
                 mode: mode,
                 controller: true,
                 rtcAudio: useRtc ? RtcAudioPlayer : undefined,
+                logger: {
+                    info(msg) {
+                        console.log(msg);
+                    },
+                    warn(msg) {
+                        console.warn(msg);
+                    },
+                    error(msg) {
+                        console.error(msg);
+                    }
+                }
             });
             slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {
                 console.log(s);
+            });
+            slideA.current.on(SLIDE_EVENTS.renderError, (err, index) => {
+                console.log(err, index);
             });
             if (mode === "sync") {
                 slideA.current.on(SLIDE_EVENTS.syncDispatch, (e) => {
@@ -74,7 +89,6 @@ function App() {
             slideA.current.renderSlide(1);
         }
         return () => {
-            console.log("slide A destroy");
             slideA.current?.destroy();
         };
     }, [taskId, prefixUrl, mode, useRtc]);
@@ -100,7 +114,6 @@ function App() {
             slideB.current.renderSlide(1);
         }
         return () => {
-            console.log("slide B destroy");
             slideB.current?.destroy();
         };
     }, [mode, taskId, prefixUrl, useRtc]);
