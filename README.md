@@ -76,6 +76,9 @@ const slide = new Slide({
 | resize  | boolean | **默认值:** false <br/> 设置是否根据窗口大小自动调整分辨率。<br/> 默认情况下 ppt 的 css 尺寸会随着 anchor 元素的大小而变化, 但是 canvas 元素的渲染分辨率不会变化。将此值设置为 true, 会使 canvas 的分辨率也跟随缩放比例缩放，这样能获得更好的性能，但是当 anchor 的 css 尺寸太小的情况下，也会导致画面模糊。<br /> 除非遇到性能问题，一般不建议设置为 true 。|
 | enableGlobalClick  | boolean |**默认值:** false <br/> 用于控制是否可以通过点击 ppt 画面执行下一步功能。<br /> 建议移动端开启，移动端受限于屏幕尺寸，交互 UI 较小，如果开启此功能会比较方便执行下一步。|
 | timestamp  | () => number |**默认值:** Date.now <br/> 此函数用于获取当前时间, 在同步及互动场景下，ppt 内部需要知道当前时间，这个时间对于参与同步(互动)的多个客户端应该是一致的，这个时间越精确，画面同步也越精确。<br />建议通过后端服务，为多个客户端下发相同的时间。|
+| rtcAudio  | RtcAudioClazz |**默认值:** null <br/> 用于 rtc 混音, 具体用法见下文 |
+| logger  | ILogger |**默认值:** null <br/> 用于接受日志, 具体用法见下文 |
+| useLocalCache  | boolean |**默认值:** true <br/> 是否启用本地缓存，启用后会将 ppt 远程资源缓存在 indexDB 中 |
 | renderOptions  | ISlideRenderOptions 对象 | 见下表 |
 
 ### ISlideRenderOptions 配置
@@ -322,4 +325,37 @@ const slide = new Slide({
         }
     }
 });
+```
+
+## webgl 上限文限制
+
+浏览器一般会限制 webgl 上下文数量在 8 到 16 个之间, 对于 `@netless/slide` 来说, 一个活动的 Slide 实例占用两个上下文, 一个负责 2D 渲染一个负责 3D 渲染.
+如果你创建的 Slide 超过了浏览器限制, 那么前面创建的 Slide 将丢失 webgl 上下文, 导致渲染异常.
+
+**活动的 Slide 实例** 即指没有调用过 `slideInstance.frozen()` 方法的实例, 它的 webgl 绘制环境可以正常工作. 如果你想冻结当前 Slide 实例，将 webgl 上下文留给新创建的 Slide 对象, 就可以
+调用 `slideInstance.frozen()`, 这个方法会将当前 ppt 画面截图, 并且保存 ppt 状态, 然后销毁 canvas 元素, 并用截到的图片替代 canvas 元素。冻结之后, Slide 对象的任意切页、上(下)一步 等操作都将失效.
+
+调用 `slideInstance.release()` 可以将 Slide 对象从冻结状态恢复.
+
+你需要自己控制活动的 Slide 实例的数量 在 4 到 8 之间, 一般建议 pc 上控制在 8 以下, 移动端控制在 4 以下.
+
+关于控制活动 ppt 的建议:
+1. 通过 [Page_Visibility_API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API) 监听页面可见性, 在页面不可见的时候, 将 Slide 对象冻结，并在页面恢复的时候将 Slide 解冻.
+2. 如果同一个页面内有多个活动 PPT, 可以设置一个固定长度的活动 PPT 队列, 将 当前获取焦点的 Slide 激活并推入队列, 将被挤出队列的 Slide 冻结.
+
+## 本地缓存管理
+
+`@netless/slide` 使用 indexDB 缓存网络资源及临时生成的纹理. `@netless/slide` 不负责缓存数据的清理, 你需要在适当的时候来清理这部分数据.
+
+和清理缓存相关的两个 api, 实例方法 clearSlideCache 和静态方法 clearLocalCache, 前者清理当前 ppt 缓存, 后者清理所有缓存. 需要注意, clearSlideCache 需要在调用 slide.destroy 之前调用, 否则不能完成清理工作.
+
+```typescript
+/**
+ * 销毁当前 Slide 实例的本地缓存, 需要在 destroy 之前调用。
+ */
+clearSlideCache(): void;
+/**
+ * 销毁历史所有本地缓存
+ */
+static clearLocalCache(): void;
 ```
