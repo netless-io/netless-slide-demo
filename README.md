@@ -270,7 +270,7 @@ const slide = new Slide({
 | ResourceError | 在 ppt 依赖的远程资源(json,png)不可用时触发, 触发后当前页无法交互 | 重新渲染当前页或者跳转下一页  |
 | RuntimeError | 未知的异常， 触发后当前页无法交互 | 跳转下一页 |
 | RuntimeWarn | 未知的警告， 在动画过程中出现，触发后动画当前帧表现异常，不影响下一帧和页面交互 | 无需特殊处理 |
-|CanvasCrash| 由于内存不足，或者 canvas 被意外的移除(没有调用 slide.destroy() 的情况下移除 canvas 元素为意外移除), 触发后 canvas 元素白屏 | 刷新网页 |
+|CanvasCrash| 由于内存不足，或者 canvas 被意外的移除(没有调用 slide.destroy() 的情况下移除 canvas 元素为意外移除), 触发后 canvas 元素白屏 | 刷新网页(或者销毁 slide 对象然后重新创建) |
 
 ```typescript
 import { SLIDE_EVENTS, ErrorType } from "@netless/slide";
