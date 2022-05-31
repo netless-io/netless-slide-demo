@@ -123,6 +123,28 @@ socket.on("slide-sync", msg => {
 });
 ```
 
+#### 互动模式下的事件模型
+
+```mermaid
+sequenceDiagram
+客户端 A->>Socket 服务: 渲染下一页
+note left of 客户端 A: 页码: 1 动画 1
+客户端 B->>Socket 服务: 执行下一步动画
+note right of 客户端 B: 页码: 1 动画 1
+Note over Socket 服务: 服务器对收到的事件排序并添加序号
+par Socket 服务 to 客户端 A
+    Socket 服务->>客户端 A: 1 渲染下一页
+    note left of 客户端 A: 页码: 2 动画 1
+    Socket 服务->>客户端 A: 2 执行下一步
+    note left of 客户端 A: 页码: 2 动画 2
+and Socket 服务 to 客户端 B
+    Socket 服务->>客户端 B: 1 渲染下一页
+    note right of 客户端 B: 页码: 2 动画 1
+    Socket 服务->>客户端 B: 2 执行下一步
+    note right of 客户端 B: 页码: 2 动画 2
+end
+```
+
 ### 整体同步
 
 在某些情况下, 需要一种机制将客户端 A 的状态一次性整体同步给客户端 B, 而不是通过一条一条事件完成同步。例如: 客户端 B 断线后重新连接至 socket 房间, 此时需要将客户端 A 的当前状态一次性同步给 B.
