@@ -125,24 +125,49 @@ socket.on("slide-sync", msg => {
 
 #### 互动模式下的事件模型
 
+互动模式下, 对 slide 对象的任何操作, 都仅以事件的形式通过 `SLIDE_EVENTS.syncDispatch` 事件将要执行的操作派发出去,
+直到收到 `SLIDE_EVENTS.syncReceive` 事件才会实际执行操作.
+
+下图描述了互动模式下的同步事件流转流程, 其中每一页 PPT 初始状态为页码 1 动画 1. 以所有事件都要经过服务器后才执行的事件模型运行, 可以保证最终每个客户端的状态都是一致的.
+
 ```mermaid
 sequenceDiagram
-客户端 A->>Socket 服务: 渲染下一页
+客户端 A->>Socket 服务: 渲染下一页(发消息)
 note left of 客户端 A: 页码: 1 动画 1
-客户端 B->>Socket 服务: 执行下一步动画
+客户端 B->>Socket 服务: 执行下一步动画(发消息)
 note right of 客户端 B: 页码: 1 动画 1
-Note over Socket 服务: 服务器对收到的事件排序并添加序号
+Note over Socket 服务: 服务器以自己收到的顺序派发事件
 par Socket 服务 to 客户端 A
-    Socket 服务->>客户端 A: 1 渲染下一页
+    Socket 服务->>客户端 A: 1. 渲染下一页(收消息)
     note left of 客户端 A: 页码: 2 动画 1
-    Socket 服务->>客户端 A: 2 执行下一步
+    Socket 服务->>客户端 A: 2. 执行下一步(收消息)
     note left of 客户端 A: 页码: 2 动画 2
 and Socket 服务 to 客户端 B
-    Socket 服务->>客户端 B: 1 渲染下一页
+    Socket 服务->>客户端 B: 1. 渲染下一页(收消息)
     note right of 客户端 B: 页码: 2 动画 1
-    Socket 服务->>客户端 B: 2 执行下一步
+    Socket 服务->>客户端 B: 2. 执行下一步(收消息)
     note right of 客户端 B: 页码: 2 动画 2
 end
+```
+
+如果消息不经过服务端排序及序号添加, 则互动模式下会出现最终状态不一致的问题, 见下图描述:
+
+```mermaid
+sequenceDiagram
+note left of 客户端 A: (初始状态)页码: 1 动画 1
+客户端 A->>客户端 A: 执行渲染下一页
+note left of 客户端 A: 页码: 2 动画 1
+客户端 A->>Socket 服务: 渲染下一页(发消息)
+note right of 客户端 B: (初始状态)页码: 1 动画 1
+客户端 B->>客户端 B: 执行下一步动画
+note right of 客户端 B: 页码: 1 动画 2
+客户端 B->>Socket 服务: 下一步动画(发消息)
+Socket 服务-->>客户端 A: 下一步动画(收消息)
+Socket 服务-->>客户端 B: 渲染下一页(收消息)
+客户端 A->>客户端 A: 执行下一步动画
+note left of 客户端 A: 页码: 2 动画 2
+客户端 B->>客户端 B: 执行渲染下一页
+note right of 客户端 B: 页码: 2 动画 1
 ```
 
 ### 整体同步
