@@ -329,7 +329,7 @@ interface SlideError extends Error {
     errorMsg: string;
 }
 
-slide.on(SLIDE_EVENTS.renderError, (err: SlideError, index: number) => {
+slide.on(SLIDE_EVENTS.renderError, ({error, index}: {error: SlideError, index: number}) => {
     console.log(`第 ${index} 页出错`);
     if (err.errorType === ErrorType.ResourceError) {
         // 跳转到下一页, 可以根据具体需求选择如何恢复, 例如弹窗确认后再做跳转动作
