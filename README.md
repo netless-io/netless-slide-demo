@@ -406,3 +406,59 @@ clearSlideCache(): void;
  */
 static clearLocalCache(): void;
 ```
+
+### 资源代理
+
+**注意: `@netless/slide@0.4.0` 版本才开始支持。**
+
+从 `@netless/slide@0.4.0` 开始, 你可以在创建 Slide 对象时提供一个 loaderDelegate 对象, 从而代理 Slide 内部所有远程资源, 进而可以实现
+资源重定向, 资源鉴权等需求.
+
+loaderDelegate 属性需符合 `ILoaderDelegate` 接口, 需要注意对于媒体资源, 并不能直接返回资源内容, 只能同步的返回重定向后的资源地址.
+
+```typescript
+export interface ILoaderDelegate {
+    /**
+     * 加载 json 资源, 需返回 json 文本
+     * @param url 原始资源地址
+     */
+    loadJson(url: string): Promise<string>;
+    /**
+     * 加载图片资源, 需返回 Blob 对象
+     * @param url 原始资源地址
+     */
+    loadImage(url: string): Promise<Blob>;
+    /**
+     * 媒体文件重定向, mp3 和 mp4 资源会调用这个代理函数, 需返回重定向后的 url
+     * @param url 原始资源地址
+     */
+    redirectMedia(url: string): string;
+}
+```
+
+一个什么也不干的 loaderDelegate 如下所示, 但是你可以对传入的 url 进行加工:
+
+```typescript
+import { Slide, ILoaderDelegate } from "@netless/slide"
+
+const delegate: ILoaderDelegate = {
+    loadJson(url: string): Promise<string> {
+        return fetch(url).then(res => {
+            return res.text();
+        });
+    },
+    loadImage(url: string): Promise<Blob> {
+        return fetch(url).then(res => {
+            return res.blob();
+        });
+    },
+    redirectMedia(url: string): string {
+        return url;
+    }
+}
+
+const slide = new Slide({
+    /// ... 其他初始化配置
+    loaderDelegate: delegate,
+})
+```
