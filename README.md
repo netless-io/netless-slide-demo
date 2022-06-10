@@ -50,6 +50,11 @@ slide.renderSlide(1);
 // 渲染最后一页
 slide.slideCount(slide.slideCount);
 ```
+
+## Slide 生命周期与事件触发时机
+
+![lifecycle](./assets/slide-lifecycle.svg)
+
 ## 可选配置项
 
 ### `Slide` 配置
