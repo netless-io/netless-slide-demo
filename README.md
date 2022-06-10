@@ -28,7 +28,7 @@ const slide = new Slide({
 
 ### 设置转换资源
 
-`Slide` 对象创建之后, 下一步需要设置转换后的资源。`taskId` 为一串 hash 字符串代表一次转换任务 id, `prefixUrl` 为一段 url 地址, 指向转换后的资源根路径。这两个参数都可以从 [转码服务的进度查询 api](https://developer.netless.link/server-zh/home/server-conversion) 中获取.
+`Slide` 对象创建之后, 下一步需要设置转换后的资源。`taskId` 为一串 hash 字符串代表一次转换任务 id, `prefixUrl` 为一段 url 地址, 指向转换后的资源根路径。这两个参数都可以从 [转码服务的进度查询 api](https://developer.netless.link/server-zh/home/server-projector) 中获取.
 
 `注意`: 你需要保证访问 prefixUrl 路径里的资源不会跨域。
 
