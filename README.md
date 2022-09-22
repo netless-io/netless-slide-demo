@@ -350,7 +350,54 @@ slide.on(SLIDE_EVENTS.renderError, ({error, index}: {error: SlideError, index: n
 });
 ```
 
+#### 通过 message 事件处理错误
+
+`@netless/slide@0.7.1` 版本开始, 还支持通过 window 的 message 事件处理错误. 主要应用于 Android 和 iOS 设备处理错误, native 代码
+可以直接在 webview 上监听 window 的 message 事件，获取错误信息，然后通过往 window 上派发 message 事件来恢复 ppt 的画面.
+
+**监听错误**
+```typescript
+window.addEventListener("message", evt => {
+    if (evt.data.type === "@slide/_error_") {
+        const { errorType, errorMsg, slideId, slideIndex } = evt.data;
+        // errorType 与上述错误类型对应，不同之处只是这里 errorType 是字符串值
+        // errorType 可能的类型有
+        // "RESOURCE_ERROR" 对应上述 ResourceError
+        // "RUNTIME_ERROR"  对应上述 RuntimeError
+        // "RUNTIME_WARN"   对应上述 RuntimeWarn
+        // "CANVAS_CRASH"   对应上述 CanvasCrash
+        
+        // slideId    指示 slide 对象的唯一 id, 发送恢复消息时候要用到这个 id
+        // slideIndex 指示报错的页码
+    }
+});
+```
+
+**恢复错误**
+
+恢复错误需要向 window 派发 message 事件, 不同的恢复方式代码如下:
+
+1. 跳转到其他页, RESOURCE_ERROR 和 RUNTIME_ERROR 可以用这种方式恢复
+```typescript
+window.postMessage({
+    type: "@slide/_recover_",
+    recoverBy: "renderOtherPage",
+    slideId: "${slideId}",        // 使用错误消息里告知的 slideId
+    slideIndex: "${slideIndex}",  // 指定要跳转到哪一页, 如果想要跳转到下一页可以使用错误消息里告知的报错页码 + 1
+});
+```
+
+2. 重新渲染当前页, RESOURCE_ERROR 可以用这种方式恢复
+```typescript
+window.postMessage({
+    type: "@slide/_recover_",
+    recoverBy: "reloadCurrentPage",
+});
+```
+
 ### 日志
+
+#### 逐条获取日志
 
 `@netless/slide@0.3.3` 版本开始, `ISlideConfig` 中添加了可选的 logger 属性, 需要传入一个符合如下接口的对象
 
@@ -376,6 +423,28 @@ const slide = new Slide({
             console.log(msg);
         }
     }
+});
+```
+
+#### 通过 postMessage 获取日志
+
+`@netless/slide@0.7.1` 版本开始, 除了上述逐条获取日志的方式外, 还可以通过 postMessage 的方式以文本的形式获取日志.
+
+1. 在 window 上派发事件, 通知 `@netless/slide` 开始发送日志
+```typescript
+window.postMessage({ type: "@slide/_request_log_" });
+```
+2. 通过监听 message 事件, 分块收取日志文本
+```typescript
+window.addEventListener("message", (evt) => {
+   if (evt.data.type === "@slide/_report_log_") {
+       console.log(evt.data.index); // 日志当前分块索引
+       console.log(evt.data.log);   // 日志文本
+       console.log(evt.data.total); // 总分块数量
+       if (evt.data.index === evt.data.total) {
+           // 则日志收取完毕
+       }
+   }
 });
 ```
 
