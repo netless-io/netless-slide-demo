@@ -432,7 +432,10 @@ const slide = new Slide({
 
 1. 在 window 上派发事件, 通知 `@netless/slide` 开始发送日志
 ```typescript
-window.postMessage({ type: "@slide/_request_log_" });
+window.postMessage({
+    type: "@slide/_request_log_",
+    sessionId: "${sessionId}",  // session 标识
+});
 ```
 2. 通过监听 message 事件, 分块收取日志文本
 ```typescript
@@ -441,6 +444,7 @@ window.addEventListener("message", (evt) => {
        console.log(evt.data.index); // 日志当前分块索引
        console.log(evt.data.log);   // 日志文本
        console.log(evt.data.total); // 总分块数量
+       console.log(evt.data.sessionId); // "@slide/_request_log_" 事件中的 sessionId
        if (evt.data.index === evt.data.total) {
            // 则日志收取完毕
        }
