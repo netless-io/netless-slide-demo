@@ -392,6 +392,7 @@ window.postMessage({
 window.postMessage({
     type: "@slide/_recover_",
     recoverBy: "reloadCurrentPage",
+    slideId: "${slideId}",        // 使用错误消息里告知的 slideId
 });
 ```
 
