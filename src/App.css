@@ -6,10 +6,46 @@
   background-position: 0 0, 15px 15px;
   width: 100vw;
   height: 100vh;
-  display: flex;
 }
 
-.Content {
+.header {
+  height: 40px;
+  background: #fff;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+}
+
+.header > div > label {
+  margin: 0 6px 0 12px;
+  font-size: 14px;
+}
+
+.header > div > label:first-child {
+  margin-left: 0;
+}
+
+.anchor {
+  position: relative;
+  height: 100%;
+}
+
+.arrow {
+  position: absolute;
+  z-index: 9;
+  padding: 6px 4px 6px 2px;
+  background: #4caf50;
+  color: #fff;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 40px);
+  justify-content: space-around;
+  align-items: center;
 }

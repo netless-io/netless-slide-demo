@@ -1284,10 +1284,10 @@
   resolved "https://registry.npmjs.org/@juggle/resize-observer/-/resize-observer-3.3.1.tgz"
   integrity sha512-zMM9Ds+SawiUkakS7y94Ymqx+S0ORzpG3frZirN3l+UlXUmSUR7hF4wxCVqW+ei94JzV5kt0uXBcoOEAuiydrw==
 
-"@netless/slide@^0.5.3":
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.5.3.tgz#3813956aaed2c36249c4fbd8dc5d189b32c7dc83"
-  integrity sha512-P7In3No9vkr5b1OpZ3AzsDr06v2PI6Jcg/VM1yZT7Llv3z/N2xhgnHvzYPTCdbxV//xXxXd4odE50MMZCRMLZQ==
+"@netless/slide@^0.7.5":
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.7.5.tgz#c6359ef5ce3c9baa5f6ff4d015ab9405ccf8b639"
+  integrity sha512-1iBJaZcIvwtTwgWd5YQqsBuC6ha8rv6K2JkO5P4lfwIdrDJdgTI1ctMmKV4gyVZpz6wjpCH08cvvD6W1uSz6RQ==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
     "@types/lodash" "^4.14.182"
@@ -1725,9 +1725,9 @@
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
 
 "@types/lodash@^4.14.182":
-  version "4.14.182"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.182.tgz#05301a4d5e62963227eaafe0ce04dd77c54ea5c2"
-  integrity sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==
+  version "4.14.186"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.186.tgz#862e5514dd7bd66ada6c70ee5fce844b06c8ee97"
+  integrity sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==
 
 "@types/mime@^1":
   version "1.3.2"
