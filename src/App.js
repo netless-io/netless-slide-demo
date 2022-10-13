@@ -113,6 +113,12 @@ function App() {
                 mode: mode,
                 controller: true,
                 rtcAudio: useRtc ? RtcAudioPlayer : undefined,
+                renderOptions: {
+                    minFPS: minFPS ? parseInt(minFPS, 10) : undefined,
+                    maxFPS: minFPS ? parseInt(maxFPS, 10) : undefined,
+                    resolution: minFPS ? parseInt(resolution, 10) : undefined,
+                    maxResolutionLevel: minFPS ? parseInt(maxResolutionLevel, 10) : undefined,
+                }
             });
             if (mode === "interactive") {
                 slideB.current.on(SLIDE_EVENTS.syncDispatch, (e) => {
