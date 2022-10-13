@@ -1,11 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { parse } from "qs";
 import { Slide, SLIDE_EVENTS } from "@netless/slide";
 import './App.css';
 import {RtcAudioPlayer} from "./RtcAudioPlayer";
 
 function App() {
+
+    const query = parse(window.location.search);
+
+    const { minFPS, maxFPS, resolution, maxResolutionLevel, pptMode } = query;
+
     const [useRtc, setUseRtc] = useState(false);
-    const [mode, setMode] = useState("local");
+    const [mode, setMode] = useState(pptMode ? pptMode : "local");
     const [taskId, setTaskId] = useState("06415a307f2011ec8bdc15d18ec9acc7");
     const [prefixUrl, setPrefixUrl] = useState("https://convertcdn.netless.group/dynamicConvert");
 
@@ -63,6 +69,12 @@ function App() {
                     error(msg) {
                         console.error(msg);
                     }
+                },
+                renderOptions: {
+                    minFPS: minFPS ? parseInt(minFPS, 10) : undefined,
+                    maxFPS: minFPS ? parseInt(maxFPS, 10) : undefined,
+                    resolution: minFPS ? parseInt(resolution, 10) : undefined,
+                    maxResolutionLevel: minFPS ? parseInt(maxResolutionLevel, 10) : undefined,
                 }
             });
             slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {

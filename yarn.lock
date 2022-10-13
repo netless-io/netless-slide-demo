@@ -1284,10 +1284,10 @@
   resolved "https://registry.npmjs.org/@juggle/resize-observer/-/resize-observer-3.3.1.tgz"
   integrity sha512-zMM9Ds+SawiUkakS7y94Ymqx+S0ORzpG3frZirN3l+UlXUmSUR7hF4wxCVqW+ei94JzV5kt0uXBcoOEAuiydrw==
 
-"@netless/slide@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.7.5.tgz#c6359ef5ce3c9baa5f6ff4d015ab9405ccf8b639"
-  integrity sha512-1iBJaZcIvwtTwgWd5YQqsBuC6ha8rv6K2JkO5P4lfwIdrDJdgTI1ctMmKV4gyVZpz6wjpCH08cvvD6W1uSz6RQ==
+"@netless/slide@^0.7.8-legacy-beta":
+  version "0.7.8-legacy-beta"
+  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.7.8-legacy-beta.tgz#3c351cb267786e6787ccbfc23b7ba787ffd44ebe"
+  integrity sha512-gZItcmyQdlFpJNtlDTIRqdZyxIYaPwzFKEyef43pyEGYFikBTaQePv6QN6oXvuz79jU/iyImTJQFZlswvsXqhw==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
     "@types/lodash" "^4.14.182"
@@ -6826,6 +6826,13 @@ qs@6.9.6:
   version "6.9.6"
   resolved "https://registry.npmjs.org/qs/-/qs-6.9.6.tgz"
   integrity sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==
+
+qs@^6.11.0:
+  version "6.11.0"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.11.0.tgz#fd0d963446f7a65e1367e01abd85429453f0c37a"
+  integrity sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==
+  dependencies:
+    side-channel "^1.0.4"
 
 queue-microtask@^1.2.2:
   version "1.2.3"
