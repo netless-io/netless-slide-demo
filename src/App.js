@@ -72,9 +72,9 @@ function App() {
                 },
                 renderOptions: {
                     minFPS: minFPS ? parseInt(minFPS, 10) : undefined,
-                    maxFPS: minFPS ? parseInt(maxFPS, 10) : undefined,
-                    resolution: minFPS ? parseInt(resolution, 10) : undefined,
-                    maxResolutionLevel: minFPS ? parseInt(maxResolutionLevel, 10) : undefined,
+                    maxFPS: maxFPS ? parseInt(maxFPS, 10) : undefined,
+                    resolution: resolution ? parseInt(resolution, 10) : undefined,
+                    maxResolutionLevel: maxResolutionLevel ? parseInt(maxResolutionLevel, 10) : undefined,
                 }
             });
             slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {
@@ -115,9 +115,9 @@ function App() {
                 rtcAudio: useRtc ? RtcAudioPlayer : undefined,
                 renderOptions: {
                     minFPS: minFPS ? parseInt(minFPS, 10) : undefined,
-                    maxFPS: minFPS ? parseInt(maxFPS, 10) : undefined,
-                    resolution: minFPS ? parseInt(resolution, 10) : undefined,
-                    maxResolutionLevel: minFPS ? parseInt(maxResolutionLevel, 10) : undefined,
+                    maxFPS: maxFPS ? parseInt(maxFPS, 10) : undefined,
+                    resolution: resolution ? parseInt(resolution, 10) : undefined,
+                    maxResolutionLevel: maxResolutionLevel ? parseInt(maxResolutionLevel, 10) : undefined,
                 }
             });
             if (mode === "interactive") {
