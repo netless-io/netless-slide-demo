@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+window.__nativeTags = {
+    platform: "ios"
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
