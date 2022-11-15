@@ -6,14 +6,14 @@ import {RtcAudioPlayer} from "./RtcAudioPlayer";
 
 function App() {
 
-    const query = parse(window.location.search);
+    const query = parse(window.location.search.replaceAll(/^\?/g, ""));
 
-    const { minFPS, maxFPS, resolution, maxResolutionLevel, pptMode } = query;
+    const { minFPS, maxFPS, resolution, maxResolutionLevel, pptMode, task_id, prefix } = query;
 
     const [useRtc, setUseRtc] = useState(false);
     const [mode, setMode] = useState(pptMode ? pptMode : "local");
-    const [taskId, setTaskId] = useState("06415a307f2011ec8bdc15d18ec9acc7");
-    const [prefixUrl, setPrefixUrl] = useState("https://convertcdn.netless.group/dynamicConvert");
+    const [taskId, setTaskId] = useState(task_id || "06415a307f2011ec8bdc15d18ec9acc7");
+    const [prefixUrl, setPrefixUrl] = useState(prefix || "https://convertcdn.netless.group/dynamicConvert");
 
     const anchorA = useRef(null);
     const slideA = useRef(null);
