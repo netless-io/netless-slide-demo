@@ -8,7 +8,7 @@ function App() {
 
     const query = parse(window.location.search.replaceAll(/^\?/g, ""));
 
-    const { minFPS, maxFPS, resolution, maxResolutionLevel, pptMode, task_id, prefix } = query;
+    const { minFPS, maxFPS, resolution, maxResolutionLevel, pptMode, task_id, prefix, forceCanvas } = query;
 
     const [useRtc, setUseRtc] = useState(false);
     const [mode, setMode] = useState(pptMode ? pptMode : "local");
@@ -75,6 +75,7 @@ function App() {
                     maxFPS: maxFPS ? parseInt(maxFPS, 10) : undefined,
                     resolution: resolution ? parseInt(resolution, 10) : undefined,
                     maxResolutionLevel: maxResolutionLevel ? parseInt(maxResolutionLevel, 10) : undefined,
+                    forceCanvas: forceCanvas ? (forceCanvas === "true") : undefined,
                 }
             });
             slideA.current.on(SLIDE_EVENTS.stateChange, (s) => {
