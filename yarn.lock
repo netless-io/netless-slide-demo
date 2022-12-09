@@ -1284,10 +1284,10 @@
   resolved "https://registry.npmjs.org/@juggle/resize-observer/-/resize-observer-3.3.1.tgz"
   integrity sha512-zMM9Ds+SawiUkakS7y94Ymqx+S0ORzpG3frZirN3l+UlXUmSUR7hF4wxCVqW+ei94JzV5kt0uXBcoOEAuiydrw==
 
-"@netless/slide@^0.8.5":
-  version "0.8.5"
-  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.8.5.tgz#50fce9e2e0b29c61a76eb36661bb665088e13252"
-  integrity sha512-2OsB5xhl76pFEfkVg868lt7BklTNue+rv6VbbePYCeepWVguycNoxcqbHtiXQ0vBtUJQrWvGdI7nOl1Mzbxa+Q==
+"@netless/slide@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@netless/slide/-/slide-0.9.0.tgz#93c1ec5416b3842f73b7de58741135ff90040931"
+  integrity sha512-MDIPqRJTndLthCAl0q6CaxqNCXPh74LnU95WoWW/dXND+0U3YmHvV2Cd/6p/HWloSGDG0MwjKDRraFY4YZwGiw==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
     "@types/lodash" "^4.14.182"
