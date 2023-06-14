@@ -541,3 +541,46 @@ const slide = new Slide({
     loaderDelegate: delegate,
 })
 ```
+
+## 全局事件
+
+### 页面渲染
+
+页面渲染过程指从页面依赖的资源加载知道页面显示完成.
+
+```javascript
+window.addEventListener("message", evt => {
+    if (evt.data.type === "@slide/_render_start_") {
+        console.log(evt.data.taskId); // ppt 转码任务的 taskId
+        console.log(`第 ${evt.data.index} 页开始渲染`);
+    } else if (evt.data.type === "@slide/_render_end_") {
+        console.log(evt.data.taskId); // ppt 转码任务的 taskId
+        console.log(`第 ${evt.data.index} 页开始结束`);
+    }
+});
+```
+
+### 离线缓存
+
+离线缓存会将 json、png 格式的资源和运行时生成的 svg 等资源缓存到 indexDB.
+
+```javascript
+// 发起离线缓存
+window.postMessage({
+    type: "@slide/_preload_slide_",
+    taskId: "", // 转码任务的 taskId,
+    prefix: "", // 转码任务返回的资源前缀
+});
+
+// 监听缓存进度
+window.addEventListener("message", evt => {
+    if (evt.data.type === "@slide/_preload_slide_progress_") {
+        console.log(evt.data.taskId); // 转码任务的 taskId
+        console.log(evt.data.progress); // 缓存的进度 0 ~ 1
+    } else if (evt.data.type === "@slide/_preload_slide_error_") {
+        // 缓存出错
+        console.log(evt.data.taskId); // 转码任务的 taskId
+        console.log(evt.data.error);
+    }
+});
+```
