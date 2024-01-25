@@ -76,15 +76,26 @@ const slide = new Slide({
 });
 ```
 
-|  key   | type  | description |
-|  ----  | ----  | ---         |
-| resize  | boolean | **默认值:** false <br/> 设置是否根据窗口大小自动调整分辨率。<br/> 默认情况下 ppt 的 css 尺寸会随着 anchor 元素的大小而变化, 但是 canvas 元素的渲染分辨率不会变化。将此值设置为 true, 会使 canvas 的分辨率也跟随缩放比例缩放，这样能获得更好的性能，但是当 anchor 的 css 尺寸太小的情况下，也会导致画面模糊。<br /> 除非遇到性能问题，一般不建议设置为 true 。|
-| enableGlobalClick  | boolean |**默认值:** false <br/> 用于控制是否可以通过点击 ppt 画面执行下一步功能。<br /> 建议移动端开启，移动端受限于屏幕尺寸，交互 UI 较小，如果开启此功能会比较方便执行下一步。|
-| timestamp  | () => number |**默认值:** Date.now <br/> 此函数用于获取当前时间, 在同步及互动场景下，ppt 内部需要知道当前时间，这个时间对于参与同步(互动)的多个客户端应该是一致的，这个时间越精确，画面同步也越精确。<br />建议通过后端服务，为多个客户端下发相同的时间。|
-| rtcAudio  | RtcAudioClazz |**默认值:** null <br/> 用于 rtc 混音, 具体用法见下文 |
-| logger  | ILogger |**默认值:** null <br/> 用于接受日志, 具体用法见下文 |
-| useLocalCache  | boolean |**默认值:** true <br/> 是否启用本地缓存，启用后会将 ppt 远程资源缓存在 indexDB 中 |
-| renderOptions  | ISlideRenderOptions 对象 | 见下表 |
+| key               | type                             | description                                                                                                                                                                                                                |
+|-------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| resize            | boolean                          | **默认值:** false <br/> 设置是否根据窗口大小自动调整分辨率。<br/> 默认情况下 ppt 的 css 尺寸会随着 anchor 元素的大小而变化, 但是 canvas 元素的渲染分辨率不会变化。将此值设置为 true, 会使 canvas 的分辨率也跟随缩放比例缩放，这样能获得更好的性能，但是当 anchor 的 css 尺寸太小的情况下，也会导致画面模糊。<br /> 除非遇到性能问题，一般不建议设置为 true 。 |
+| enableGlobalClick | boolean                          | **默认值:** false <br/> 用于控制是否可以通过点击 ppt 画面执行下一步功能。<br /> 建议移动端开启，移动端受限于屏幕尺寸，交互 UI 较小，如果开启此功能会比较方便执行下一步。                                                                                                                      |
+| timestamp         | () => number                     | **默认值:** Date.now <br/> 此函数用于获取当前时间, 在同步及互动场景下，ppt 内部需要知道当前时间，这个时间对于参与同步(互动)的多个客户端应该是一致的，这个时间越精确，画面同步也越精确。<br />建议通过后端服务，为多个客户端下发相同的时间。                                                                                    |
+| rtcAudio          | RtcAudioClazz                    | **默认值:** null <br/> 用于 rtc 混音, 具体用法见下文                                                                                                                                                                                     |
+| logger            | ILogger                          | **默认值:** null <br/> 用于接受日志, 具体用法见下文                                                                                                                                                                                        |
+| useLocalCache     | boolean                          | **默认值:** true <br/> 是否启用本地缓存，启用后会将 ppt 远程资源缓存在 indexDB 中                                                                                                                                                                   |
+| renderOptions     | ISlideRenderOptions 对象           | 见下表                                                                                                                                                                                                                        |
+| urlInterrupter    | (url: string) => Promise&lt;string&gt; | **默认值:** url <br/> 根据公开地址返回可访问地址(用于私有存储服务)                                                                                                                                                                                 |
+
+#### urlInterrupter 举例
+```ts
+const urlInterrupter = async (url: string) => {
+    // 根据不同的云存储服务会有不同的实现, 一般都是在查询参数添加签名
+    const { ak, expire } = await getSTSToken() // 客户服务端实现
+    return `${url}?expire=${expire}&ak=${ak}`
+};
+```
+
 
 ### ISlideRenderOptions 配置
 
