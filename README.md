@@ -106,7 +106,17 @@ const urlInterrupter = async (url: string) => {
 | resolution | number | **默认值:** pc 浏览器为 window.devicePixelRatio; 移动端浏览器为 1 。<br/> 设置渲染分辨倍率, 原始 ppt 有自己的像素尺寸，当在 2k 或者 4k 屏幕下，如果按原始 ppt 分辨率显示，画面会比较模糊。可以调整此值，使画面更清晰，同时性能开销也变高。<br /> 建议保持默认值就行，或者固定为 1。 |
 | autoResolution | boolean | **默认值:** false, 控制是否根据运行时实际 fps 自动缩放渲染分辨率, 使得运行时 fps 保持在 minFPS 和 masFPS 之间 |
 | autoFPS | boolean | **默认值:** false, 控制开启动态 fps, 开启后, 会根据 cpu 效率动态提升和降低 fps |
+| maxResolutionLevel | **默认值:** [0, 4]的整数 pc端为4, 手机端为2。 GPU性能不够的机型建议下降此值. |
 | transactionBgColor | string &#124; number | **默认值:** 0x000000, 设置切页动画的背景色, 接受 css 颜色字符串或者 16进制颜色值("#ffffff",0xffffff) |
+
+
+maxResolutionLevel 取值解释:
+0. 640*360
+1. 960*540
+2. 1280*720
+3. 1920*1080
+4. 3200*1800
+
 
 ### 互动模式
 
@@ -395,7 +405,7 @@ window.postMessage({
     recoverBy: "renderOtherPage",
     slideId: "${slideId}",        // 使用错误消息里告知的 slideId
     slideIndex: "${slideIndex}",  // 指定要跳转到哪一页, 如果想要跳转到下一页可以使用错误消息里告知的报错页码 + 1
-});
+}, "*");
 ```
 
 2. 重新渲染当前页, RESOURCE_ERROR 可以用这种方式恢复
@@ -404,7 +414,7 @@ window.postMessage({
     type: "@slide/_recover_",
     recoverBy: "reloadCurrentPage",
     slideId: "${slideId}",        // 使用错误消息里告知的 slideId
-});
+}, "*");
 ```
 
 ### 日志
@@ -447,7 +457,7 @@ const slide = new Slide({
 window.postMessage({
     type: "@slide/_request_log_",
     sessionId: "${sessionId}",  // session 标识
-});
+}, "*");
 ```
 2. 通过监听 message 事件, 分块收取日志文本
 ```typescript
@@ -581,7 +591,7 @@ window.postMessage({
     type: "@slide/_preload_slide_",
     taskId: "", // 转码任务的 taskId,
     prefix: "", // 转码任务返回的资源前缀
-});
+}, "*");
 
 // 监听缓存进度
 window.addEventListener("message", evt => {
