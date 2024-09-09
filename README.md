@@ -544,11 +544,11 @@ import { Slide, ILoaderDelegate } from "@netless/slide"
 const delegate: ILoaderDelegate = {
     async loadJson(url: string): Promise<string> {
         const res = await fetch(url);
-        return res.text();
+        return await res.text();
     },
     async loadImage(url: string): Promise<Blob> {
         const res = await fetch(url)
-        return res.blob();
+        return await res.blob();
     },
     redirectMedia(url: string): string {
         return url;
