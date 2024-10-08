@@ -404,7 +404,9 @@ window.postMessage({
     type: "@slide/_recover_",
     recoverBy: "renderOtherPage",
     slideId: "${slideId}",        // 使用错误消息里告知的 slideId
-    slideIndex: "${slideIndex}",  // 指定要跳转到哪一页, 如果想要跳转到下一页可以使用错误消息里告知的报错页码 + 1
+    payload: {
+        slideIndex: "${slideIndex}",  // 指定要跳转到哪一页, 如果想要跳转到下一页可以使用错误消息里告知的报错页码 + 1
+    }
 }, "*");
 ```
 
