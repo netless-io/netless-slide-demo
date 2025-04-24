@@ -585,21 +585,41 @@ window.addEventListener("message", evt => {
 
 ```javascript
 // 发起离线缓存
+// 缓存指定页码
 window.postMessage({
     type: "@slide/_preload_slide_",
     taskId: "", // 转码任务的 taskId,
     prefix: "", // 转码任务返回的资源前缀
+    pages: [1,2,3,4,5],  // 缓存第 1 2 3 4 5 页
+    sessionId: '12345', // 随机传, 用于区分不同的缓存
+}, "*");
+
+
+window.postMessage({
+    type: "@slide/_preload_slide_",
+    taskId: "",
+    prefix: "",
+    pages: [1,2,3,5,8,13], // 缓存 1 2 3 5 8 13 页, 可以跳页缓存
+    sessionId: "32345",
+}, "*");
+
+// 不传 pages 缓存所有页
+window.postMessage({
+    type: "@slide/_preload_slide_",
+    taskId: "",
+    prefix: "",
+    sessionId: "all", 
 }, "*");
 
 // 监听缓存进度
 window.addEventListener("message", evt => {
     if (evt.data.type === "@slide/_preload_slide_progress_") {
-        console.log(evt.data.taskId); // 转码任务的 taskId
-        console.log(evt.data.progress); // 缓存的进度 0 ~ 1
+        const { sessionId, taskId, progress } = evt.data;
+        console.log(sessionId, taskId, progress);
     } else if (evt.data.type === "@slide/_preload_slide_error_") {
-        // 缓存出错
-        console.log(evt.data.taskId); // 转码任务的 taskId
-        console.log(evt.data.error);
+        // 缓存出错 转码任务的 taskId
+        const { sessionId, taskId, error } = evt.data;
+        console.log(sessionId, taskId, error);
     }
 });
 ```
