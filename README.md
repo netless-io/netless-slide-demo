@@ -625,3 +625,66 @@ window.addEventListener("message", evt => {
     }
 });
 ```
+
+## 更多用法
+
+### 已转换PPT添加自定义`link`
+
+要使用完整功能需2步
+1. 在ppt中添加自定义的`link`
+
+    `@netless/slide@1.4.32`以上版本支持 `addlink` 模式, 可以在已转换的 PPT 中添加自定义的 `link` 事件. 并通过监听 `SLIDE_EVENTS.useraddLink` 时间获取用户点击的元素 id.
+    ```javascript
+    import { Slide, SLIDE_EVENTS } from "@netless/slide";
+    
+    const slide = new Slide({
+        anchor: someDivElement,
+        interactive: true,
+        mode: "addLink",
+        logger: {
+            info(msg: string) {
+                console.log(msg);
+            }
+        }
+    });
+    
+    slide.current.on(SLIDE_EVENTS.useraddLink, (taskId: string, pageIndex: number, shapeId: string) => {
+        console.log("useraddLink", taskId, pageIndex, shapeId);
+    });
+    ```
+    可以通过`SLIDE_EVENTS.useraddLink`事件获取用户点击的元素的`shapeId`, 通过弹框或其他方式让用户输入使用其他模式渲染时候需要跳转的`link`, 后续传入`slide`内使用
+    注意: 这个方法无法覆盖原有的`link`, 只能给无点击事件的元素添加. `addLink`只作为添加自定义`link`的模式, 不应该在多人房间内使用.
+
+2. 将准备好的 `link` 传入 `slide` 内
+    同样需要 `@netless/slide@1.4.32`以上版本, 在创建 `slide` 实例时传入 `customLinks`和`navigatorDelegate`即可
+    ```typescript
+    import { Slide, CustomLink } from "@netless/slide";
+    const customLinks: CustomLink[] = [
+        {
+            "pageIndex": 1,
+            "shapeId": "slide-3",
+            "link": "random11=1"
+        }
+    ];
+    
+    const slide = new Slide({
+        anchor: someDivElement,
+        interactive: true,
+        mode: "interactive", // 按需选择
+        // 自定义的 link 信息
+        customLinks: customLinks,
+        logger: {
+            info(msg: string) {
+                console.log(msg);
+            }
+        },
+        // 自定义的 link 跳转逻辑
+        navigatorDelegate: {
+            openUrl(url: string) {
+                console.log("open url", url);
+            }
+        }
+    });
+    ```
+    点击元素后会触发`navigatorDelegate.openUrl`函数, 并传入`url`, 可以根据`url`参数自定义要完成的动作
+    
