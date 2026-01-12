@@ -1,5 +1,7 @@
 # netless-slide demo
 
+[English](./README_EN.md) | 简体中文
+
 这个项目是 `@netless/slide` 库的前端示例, 需要已经完成文档转换并且获取了 `taskId` 和 `prefixUrl` 才能进一步使用 `@netless/slide` 在浏览器中展示 ppt。
 
 [在线演示](https://netless-io.github.io/netless-slide-demo/)
@@ -86,6 +88,13 @@ const slide = new Slide({
 | useLocalCache     | boolean                          | **默认值:** true <br/> 是否启用本地缓存，启用后会将 ppt 远程资源缓存在 indexDB 中                                                                                                                                                                   |
 | renderOptions     | ISlideRenderOptions 对象           | 见下表                                                                                                                                                                                                                        |
 | urlInterrupter    | (url: string) => Promise&lt;string&gt; | **默认值:** url <br/> 根据公开地址返回可访问地址(用于私有存储服务)                                                                                                                                                                                 |
+| navigatorDelegate | INavigatorDelegate               | **默认值:** undefined <br/> PPT 页面导航代理，添加此属性后，ppt 内部动作导致的页码变化，都经过此代理逻辑。PPT 打开网页需要通过 openUrl 方法，PPT 翻页需要通过 gotoPage 方法。具体用法见下文"添加自定义 link"部分。                                                                                             |
+| customLinks       | CustomLink[]                     | **默认值:** undefined <br/> 自定义链接配置数组，用于给 PPT 中的元素添加自定义跳转链接。具体用法见下文"添加自定义 link"部分。                                                                                                                                                                  |
+| clientId          | string                           | **默认值:** undefined <br/> 客户端唯一标识，在同步和互动场景下需要能够区分每个不同的客户端。对于接收同步消息的一端，需要用此 ClientId 区分是否收到了自己发送的消息。如果在同步和互动场景下不提供此值，可能会导致某些情况下状态不同步。                                                                                 |
+| enableTracking    | boolean                          | **默认值:** true <br/> 是否启用日志追踪，启用后会定期定量将本地日志上传到 sdk 远程服务器                                                                                                                                                                          |
+| enableWebAudio    | boolean                          | **默认值:** false <br/> 是否使用 Web Audio API 播放声音                                                                                                                                                                               |
+| resourceTimeout   | number                           | **默认值:** 15000 <br/> 资源加载超时时间，单位毫秒                                                                                                                                                                                  |
+| fixedFrameSize    | { width: number; height: number; } | **默认值:** undefined <br/> 为 ppt 设置固定的宽度和高度，设置后 ppt 不会随父元素大小自动变化。如果有缩放需求，需要调用 updateFixedFrameSize 方法。width 和 height 属性的单位是 px。                                                                                                               |
 
 #### urlInterrupter 举例
 ```ts
@@ -101,13 +110,16 @@ const urlInterrupter = async (url: string) => {
 
 |  key   | type  | description |
 |  ----  | ----  | ---         |
-| minFPS | number | **默认值:** 30 <br/> 设置最小 fps, 应用会尽量保证实际 fps 高于此值, 此值越小, cpu 开销越小。 |
-| maxFPS | number | **默认值:** 40 <br/> 设置最大 fps, 应用会保证实际 fps 低于此值, 此值越小, cpu 开销越小。 |
+| minFPS | number | **默认值:** 40 <br/> 设置最小 fps, 应用会尽量保证实际 fps 高于此值, 此值越小, cpu 开销越小。 |
+| maxFPS | number | **默认值:** 50 <br/> 设置最大 fps, 应用会保证实际 fps 低于此值, 此值越小, cpu 开销越小。 |
 | resolution | number | **默认值:** pc 浏览器为 window.devicePixelRatio; 移动端浏览器为 1 。<br/> 设置渲染分辨倍率, 原始 ppt 有自己的像素尺寸，当在 2k 或者 4k 屏幕下，如果按原始 ppt 分辨率显示，画面会比较模糊。可以调整此值，使画面更清晰，同时性能开销也变高。<br /> 建议保持默认值就行，或者固定为 1。 |
 | autoResolution | boolean | **默认值:** false, 控制是否根据运行时实际 fps 自动缩放渲染分辨率, 使得运行时 fps 保持在 minFPS 和 masFPS 之间 |
 | autoFPS | boolean | **默认值:** false, 控制开启动态 fps, 开启后, 会根据 cpu 效率动态提升和降低 fps |
-| maxResolutionLevel | **默认值:** [0, 4]的整数 pc端为4, 手机端为2。 GPU性能不够的机型建议下降此值. |
+| maxResolutionLevel | number | **默认值:** pc端为4, 手机端为2。 GPU性能不够的机型建议下降此值。 |
 | transactionBgColor | string &#124; number | **默认值:** 0x000000, 设置切页动画的背景色, 接受 css 颜色字符串或者 16进制颜色值("#ffffff",0xffffff) |
+| forceCanvas | boolean | **默认值:** false, 是否强制使用 2D 渲染，强制使用 2D 渲染会失去部分 3D、滤镜和效果 |
+| transitionResolutionLevel | number | **默认值:** pc端为4, 手机端为2。 切页动画截图分辨率等级 |
+| antialias | boolean | **默认值:** undefined, 是否开启抗锯齿 |
 
 
 maxResolutionLevel 取值解释:
@@ -116,6 +128,29 @@ maxResolutionLevel 取值解释:
 2. 1280*720
 3. 1920*1080
 4. 3200*1800
+
+
+### SLIDE_EVENTS 事件说明
+
+`@netless/slide` 导出 `SLIDE_EVENTS` 对象，包含所有可用的事件类型：
+
+| 事件名 | 说明 |
+|--------|------|
+| syncDispatch | 同步事件派发，在互动模式和同步模式下触发 |
+| syncReceive | 同步事件接收，用于接收来自其他客户端的同步事件 |
+| syncEventLag | 仅在同步模式下触发，表示同步消息延迟需要全量同步 |
+| renderStart | 当前 slide 开始渲染时触发 |
+| renderEnd | 当前 slide 渲染完成时触发 |
+| renderError | 当前 slide 渲染错误时触发 |
+| slideChange | 页码变化时触发 |
+| mainSeqStepStart | 主序列动画开始时触发 |
+| mainSeqStepEnd | 主序列动画结束时触发 |
+| animateStart | 任意动画开始时触发 |
+| animateEnd | 任意动画结束时触发 |
+| stateChange | slide 状态变化时触发 |
+| slideStepEnd | ppt 没有下一步动作时触发 |
+| slideStepStart | ppt 没有上一步动作时触发 |
+| useraddLink | 用户点击元素时触发（仅在 addLink 模式下） |
 
 
 ### 互动模式
@@ -587,7 +622,7 @@ window.addEventListener("message", evt => {
 
 ```javascript
 // 发起离线缓存
-// 缓存指定页码
+// 缓存指定页码  仅在 @netless/slide^1.4.21 版本开始支持
 window.postMessage({
     type: "@slide/_preload_slide_",
     taskId: "", // 转码任务的 taskId,
@@ -611,6 +646,17 @@ window.postMessage({
     taskId: "",
     prefix: "",
     sessionId: "all", 
+}, "*");
+
+
+// @netless/slide@1.4.4 到 @netless/slide@1.4.21 前版本的缓存方式
+// 仅支持缓存所有页
+window.postMessage({
+    type: "@slide/_preload_slide_",
+    taskId: "",
+    prefix: "",
+    // 不传 sessionId
+    // sessionId: "all",
 }, "*");
 
 // 监听缓存进度

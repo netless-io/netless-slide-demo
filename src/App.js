@@ -4,6 +4,26 @@ import { Slide, SLIDE_EVENTS } from "@netless/slide";
 import './App.css';
 import {RtcAudioPlayer} from "./RtcAudioPlayer";
 
+// 示例自定义链接配置
+const customLinks = [
+    {
+        pageIndex: 1,
+        shapeId: "example",
+        link: "https://example.com"
+    }
+];
+
+// 示例导航代理
+const navigatorDelegate = {
+    gotoPage: (index) => {
+        console.log("Navigate to page:", index);
+    },
+    openUrl: (url) => {
+        console.log("Open URL:", url);
+        window.open(url, '_blank');
+    }
+};
+
 function App() {
 
     const query = parse(window.location.search.replaceAll(/^\?/g, ""));
@@ -59,6 +79,7 @@ function App() {
                 mode: mode,
                 controller: true,
                 rtcAudio: useRtc ? RtcAudioPlayer : undefined,
+                navigatorDelegate: navigatorDelegate,
                 logger: {
                     info(msg) {
                         console.log(msg);
@@ -114,6 +135,7 @@ function App() {
                 mode: mode,
                 controller: true,
                 rtcAudio: useRtc ? RtcAudioPlayer : undefined,
+                navigatorDelegate: navigatorDelegate,
                 renderOptions: {
                     minFPS: minFPS ? parseInt(minFPS, 10) : undefined,
                     maxFPS: maxFPS ? parseInt(maxFPS, 10) : undefined,
