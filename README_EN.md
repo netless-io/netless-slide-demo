@@ -53,7 +53,7 @@ slide.renderSlide(slide.slideCount);
 
 ## Slide Lifecycle and Event Trigger Timing
 
-![lifecycle](./assets/slide-lifecycle.svg)
+![lifecycle](./assets/slide-lifecycle.jpg)
 
 ## Optional Configuration Options
 
